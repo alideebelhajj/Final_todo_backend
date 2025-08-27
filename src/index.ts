@@ -58,6 +58,9 @@ app.use(cookieParser());
 // ✅ Run JWT auth globally so req.userId is set early
 app.use(jwtAuth);
 
+// Small, explicit handler to silence favicon requests in dev
+app.get("/favicon.ico", (_req: Request, res: Response) => res.status(204).end());
+
 // 3. Mount GraphQL (no CSRF)
 async function mountGraphQL() {
   const server = new ApolloServer({
@@ -91,7 +94,7 @@ const csrfProtection = csurf({
   },
 });
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   const urlPath = req.originalUrl || "";
   if (
     urlPath.startsWith("/graphql") ||
@@ -101,7 +104,7 @@ app.use((req, res, next) => {
     return next();
   }
 
-  csrfProtection(req, res, err => {
+  csrfProtection(req, res, (err?: any) => {
     if (err) return next(err);
     res.locals.csrfToken = req.csrfToken();
     next();
@@ -138,20 +141,23 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   next(err);
 });
 
-// 9. Global Express error handler
-app.use((err: any, req: Request, res: Response) => {
-  console.error("❗️ Express Error:", err.stack || err);
+// 9. Global Express error handler (fix: must have 4 args)
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error("❗️ Express Error:", err?.stack || err);
 
   const urlPath = req.originalUrl || "";
   if (urlPath.startsWith("/graphql")) {
     return res.status(500).json({
-      errors: [{ message: err.message || "Internal server error" }],
+      errors: [{ message: err?.message || "Internal server error" }],
     });
   }
 
+  // If headers already sent, delegate to Express default
+  if (res.headersSent) return next(err);
+
   res.status(500).render("error", {
-    message: err.message || "Something went wrong",
-    stack: process.env.NODE_ENV === "development" ? err.stack : null,
+    message: err?.message || "Something went wrong",
+    stack: process.env.NODE_ENV === "development" ? err?.stack : null,
   });
 });
 
