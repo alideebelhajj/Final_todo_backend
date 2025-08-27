@@ -1,0 +1,60 @@
+<%- include("layouts/header") %>
+
+<div class="container">
+  <!-- App Header -->
+  <div class="app-header">
+    <h1>TO DO APP</h1>
+    <p>Stop Procrastinating. Start Organizing.</p>
+  </div>
+
+  <!-- User Info -->
+  <div class="user-info">
+    <span>Welcome, <strong><%= user.email %></strong></span>
+    <form action="/logout" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <button type="submit" id="logout-btn" class="logout-btn">Logout</button>
+    </form>
+  </div>
+
+  <!-- Errors -->
+  <% if (errors.length) { %>
+    <ul class="errors">
+      <% errors.forEach(err => { %>
+        <li><%= err.msg %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+
+  <!-- Todo List -->
+  <ul id="todo-list">
+    <% todos.forEach(todo => { %>
+      <li class="todo-item">
+        <!-- Toggle Complete -->
+        <form action="/todos/<%= todo._id %>/toggle" method="POST" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button type="submit" class="toggle-btn">
+            <%= todo.completed ? "✅" : "⬜️" %>
+          </button>
+        </form>
+
+        <!-- Task Text -->
+        <span class="<%= todo.completed ? 'completed' : '' %>"><%= todo.text %></span>
+
+        <!-- Delete -->
+        <form action="/todos/<%= todo._id %>/delete" method="POST" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button type="submit" class="delete-btn">🗑</button>
+        </form>
+      </li>
+    <% }) %>
+  </ul>
+
+  <!-- Add Todo Form -->
+  <form id="add-form" action="/todos/add" method="POST" class="add-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <input type="text" id="new-text" name="text" placeholder="New Note" />
+    <button type="submit" class="btn">Add New Note</button>
+  </form>
+</div>
+
+<%- include("layouts/footer") %>

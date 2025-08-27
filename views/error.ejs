@@ -1,0 +1,13 @@
+<!-- File: views/error.ejs -->
+
+<%- include("layouts/header") %>
+
+<div class="error-page">
+  <h1>Something went wrong</h1>
+  <p><%= message %></p>
+  <% if (stack) { %>
+    <pre><%= stack %></pre>
+  <% } %>
+</div>
+
+<%- include("layouts/footer") %>

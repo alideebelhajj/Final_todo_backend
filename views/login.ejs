@@ -1,0 +1,66 @@
+<%- include("layouts/header") %>
+
+<div class="container">
+  <div class="app-header">
+    <h1>Login</h1>
+    <p>Access your tasks and get organized!</p>
+  </div>
+
+  <% const globalErrs = errors.filter(e => !e.param); %>
+  <% if (globalErrs.length) { %>
+    <div class="alert">
+      <ul>
+        <% globalErrs.forEach(err => { %>
+          <li><%= err.msg %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+
+  <div class="form-container">
+    <form action="/login" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+      <!-- Username -->
+      <div class="form-group">
+        <label for="login-username">Username</label>
+        <input
+          id="login-username"
+          type="text"
+          name="username"
+          placeholder="Enter your username"
+          value="<%= data.username || '' %>"
+          required
+        />
+        <% const uErr = errors.find(e => e.param === 'username'); %>
+        <% if (uErr) { %>
+          <div class="field-error"><%= uErr.msg %></div>
+        <% } %>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <input
+          id="login-password"
+          type="password"
+          name="password"
+          placeholder="Your password"
+          required
+        />
+        <% const pErr = errors.find(e => e.param === 'password'); %>
+        <% if (pErr) { %>
+          <div class="field-error"><%= pErr.msg %></div>
+        <% } %>
+      </div>
+
+      <button type="submit" class="btn">Login</button>
+    </form>
+
+    <div class="form-footer">
+      Don't have an account? <a href="/register">Signup</a>
+    </div>
+  </div>
+</div>
+
+<%- include("layouts/footer") %>

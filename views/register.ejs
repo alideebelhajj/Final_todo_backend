@@ -1,0 +1,82 @@
+<%- include("layouts/header") %>
+
+<div class="container">
+  <div class="app-header">
+    <h1>Register</h1>
+    <p>Create your account to manage tasks efficiently!</p>
+  </div>
+
+  <% const globalErrs = errors.filter(e => !e.param); %>
+  <% if (globalErrs.length) { %>
+    <div class="alert">
+      <ul>
+        <% globalErrs.forEach(err => { %>
+          <li><%= err.msg %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+
+  <div class="form-container">
+    <form action="/register" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+      <!-- Username -->
+      <div class="form-group">
+        <label for="reg-username">Username</label>
+        <input
+          id="reg-username"
+          type="text"
+          name="username"
+          placeholder="Enter your username"
+          value="<%= data.username || '' %>"
+          required
+        />
+        <% const uErr = errors.find(e => e.param === 'username'); %>
+        <% if (uErr) { %>
+          <div class="field-error"><%= uErr.msg %></div>
+        <% } %>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="reg-password">Password</label>
+        <input
+          id="reg-password"
+          type="password"
+          name="password"
+          placeholder="At least 8 characters"
+          required
+        />
+        <% const pErr = errors.find(e => e.param === 'password'); %>
+        <% if (pErr) { %>
+          <div class="field-error"><%= pErr.msg %></div>
+        <% } %>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="form-group">
+        <label for="confirm-password">Confirm Password</label>
+        <input
+          id="confirm-password"
+          type="password"
+          name="confirmPassword"
+          placeholder="Repeat your password"
+          required
+        />
+        <% const cErr = errors.find(e => e.param === 'confirmPassword'); %>
+        <% if (cErr) { %>
+          <div class="field-error"><%= cErr.msg %></div>
+        <% } %>
+      </div>
+
+      <button type="submit" class="btn">Register</button>
+    </form>
+
+    <div class="form-footer">
+      Already have an account? <a href="/login">Login</a>
+    </div>
+  </div>
+</div>
+
+<%- include("layouts/footer") %>
